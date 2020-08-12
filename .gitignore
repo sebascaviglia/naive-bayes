@@ -1,39 +1,51 @@
-# History files
-.Rhistory
-.Rapp.history
+title: "R Notebook"
+output: html_notebook
+---
 
-# Session Data files
-.RData
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
 
-# User-specific files
-.Ruserdata
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
-# Example code in package build process
-*-Ex.R
+```{r}
+# bayes
+#instalamos 
+install.packages("naivebayes")
+install.packages("e1071")
 
-# Output files from R CMD build
-/*.tar.gz
+#cargamos las librerias
+library("naivebayes")
+library(e1071)
+library(caret)
 
-# Output files from R CMD check
-/*.Rcheck/
+#importamos data set
+ep <- read.csv("../Desktop/sebastian/r studio/cheat sheet/electronics-purchase.csv.txt")
 
-# RStudio files
-.Rproj.user/
+#instalamos semilla 
+set.seed(2018)
 
-# produced vignettes
-vignettes/*.html
-vignettes/*.pdf
 
-# OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
-.httr-oauth
+```
+```{r}
+#creamos el sub set para el modelo
 
-# knitr and R markdown default cache directories
-*_cache/
-/cache/
+t.ids <- createDataPartition(ep$Purchase, p=0.67 , list = FALSE)
 
-# Temporary files created by R markdown
-*.utf8.md
-*.knit.md
+#creamos el modelo
 
-# R Environment Variables
-.Renviron
+mod <-  naiveBayes(Purchase ~ . , data = ep[t.ids,])
+
+# vemos el modelo
+mod
+```
+
+
+```{r}
+#comprobamos el modelo
+
+pred <- predict(mod, ep[-t.ids,])
+
+#cremos una matriz de confusion
+
+tab <- table(ep[-t.ids,]$Purchase, pred, dnn = c("actual" , "predicha"))
+
+confusionMatrix(tab)
